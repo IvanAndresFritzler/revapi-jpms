@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2023 Lukas Krejci
+ * Copyright 2014-2025 Lukas Krejci
  * and other contributors as indicated by the @author tags.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -93,6 +93,9 @@ public final class Compiler {
         File sourceDir = new File(targetPath, "sources");
         sourceDir.mkdir();
 
+        File modulesDir = new File(targetPath, "modules");
+        modulesDir.mkdir();
+
         File lib = new File(targetPath, "lib");
         lib.mkdir();
 
@@ -103,13 +106,26 @@ public final class Compiler {
         int prefixLength = (int) Math.log10(nofArchives) + 1;
 
         IdentityHashMap<Archive, File> classPathFiles = copyArchives(classPath, lib, 0, prefixLength);
+
+        Path modulesTarget = modulesDir.toPath();
+
+        for (Archive a : classPath) {
+            Files.copy(extracted(a), Path.of(modulesTarget.toString() + "/" + UUID.randomUUID().toString() + ".jar"));
+        }
+
+        for (Archive a : additionalClassPath) {
+            Files.copy(extracted(a), Path.of(modulesTarget.toString() + "/" + UUID.randomUUID().toString() + ".jar"));
+        }
+
+        copyArchives(classPath, modulesDir, 0, prefixLength);
         IdentityHashMap<Archive, File> additionClassPathFiles = copyArchives(additionalClassPath, lib, classPathSize,
                 prefixLength);
 
-        List<String> options = Arrays.asList("-d", sourceDir.toString(), "-cp", composeClassPath(lib));
+        List<String> options = Arrays.asList("--module-path", modulesTarget.toString(), "-d", sourceDir.toString(),
+                "-cp", composeClassPath(lib));
 
         List<JavaFileObject> sources = Arrays.<JavaFileObject> asList(new MarkerAnnotationObject(),
-                new ArchiveProbeObject());
+                new ArchiveProbeObject(), new ModuleProbeObject());
 
         // the locale and charset are actually not important, because the only sources we're providing
         // are not file-based. The rest of the stuff the compiler will be touching is already compiled

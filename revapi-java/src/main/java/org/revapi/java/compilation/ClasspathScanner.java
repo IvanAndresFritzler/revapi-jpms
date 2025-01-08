@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2024 Lukas Krejci
+ * Copyright 2014-2025 Lukas Krejci
  * and other contributors as indicated by the @author tags.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -63,6 +63,7 @@ import javax.lang.model.element.ElementKind;
 import javax.lang.model.element.ElementVisitor;
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.Modifier;
+import javax.lang.model.element.ModuleElement;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.element.VariableElement;
 import javax.lang.model.type.ArrayType;
@@ -397,6 +398,7 @@ final class ClasspathScanner {
             fileManager.setLocation(location, Collections.singleton(path));
 
             List<TypeElement> typesToScan = new ArrayList<>();
+            List<ModuleElement> modulesToScan = new ArrayList<>();
 
             // List all class files in the given location, eagerly convert them into TypeElements that need to be
             // scanned. The JavaFileObjects are eagerly converted as they use '$' to indicate an inner class instead of
@@ -409,6 +411,13 @@ final class ClasspathScanner {
 
                 if (type != null) {
                     typesToScan.add(type);
+                }
+
+                ModuleElement module = Util.findModuleByBinaryName(environment.getElementUtils(),
+                        fileManager.inferBinaryName(location, jfo));
+
+                if (module != null) {
+                    modulesToScan.add(module);
                 }
             }
 

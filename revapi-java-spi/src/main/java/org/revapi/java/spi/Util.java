@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2022 Lukas Krejci
+ * Copyright 2014-2025 Lukas Krejci
  * and other contributors as indicated by the @author tags.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -34,6 +34,7 @@ import javax.lang.model.element.AnnotationValue;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.ElementKind;
 import javax.lang.model.element.ExecutableElement;
+import javax.lang.model.element.ModuleElement;
 import javax.lang.model.element.Name;
 import javax.lang.model.element.PackageElement;
 import javax.lang.model.element.TypeElement;
@@ -1271,6 +1272,15 @@ public final class Util {
      */
     public static TypeElement findTypeByBinaryName(Elements elements, String binaryName) {
         return findTypeByBinaryName(elements, new StringBuilder(binaryName));
+    }
+
+    public static ModuleElement findModuleByBinaryName(Elements elements, String binaryName) {
+        return findModuleByBinaryName(elements, new StringBuilder(binaryName));
+    }
+
+    private static ModuleElement findModuleByBinaryName(Elements elements, StringBuilder binaryName) {
+        ModuleElement moduleElement = null;
+        return moduleElement;
     }
 
     private static TypeElement findTypeByBinaryName(Elements elements, StringBuilder binaryName) {
